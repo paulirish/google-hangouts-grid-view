@@ -1,0 +1,35 @@
+{
+  "name": "Hangouts Grid View",
+  "description": "Get some gridd",
+  "version": "0.1",
+  "background": {
+    "scripts": ["gridview-background.js"],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+    "matches": [
+      "https://hangouts.google.com/*"
+    ],
+    "js": [
+      "gridview-content.js"
+    ],
+    "run_at": "document_idle",
+    "all_frames": false
+  }
+],
+
+  "permissions": ["https://hangouts.google.com/"],
+  "icons": {
+    // "16": "icon-16.png",
+    // "48": "icon-48.png",
+    "128": "icon-128.png"
+  },
+  "browser_action": {
+    // "default_icon": "lcp-on.png",
+    "default_title": "Google Hangouts Grid View - Click to toggle on / off"
+  },
+  "manifest_version": 2,
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy5Hjn5BDYtngVzsXekpvAPQW7SFpKIM2z/xV4py5XTfOAT5Ln/rEnYfwGNrw6WEZAPo2OsFnSg1ZOpCe7E5NmQVyqbKul9sDwu7wtQ288W8nu2/OoeDfTrfUPSKswTPpA8DbFBLAyYsqLABvg8hpfWRBlKywGSNOAfciJCH13tyUDCMeDWrAbrpdjZDOjTXu7AXLEc5qrAPyLlDisK50THyyCU6BbLttJmIFo3Ymen8UrKkpKsp0ewr5AEDEm4HGgM6/rnAc2Ivpdnt3H3jKv/Ttge9/AkBFvPG0eEgilzkLfydgs1TZp/n4W5Az87LqNH9gN6tJz4z6h+ez3hbmiwIDAQAB"
+
+}
