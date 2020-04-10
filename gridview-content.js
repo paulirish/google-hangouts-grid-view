@@ -12,19 +12,21 @@ run();
 async function run() {
   // running this multiple times just toggles between ON and OFF
   const isAlreadyOn = document.querySelector('.__gv_css');
-  if (isAlreadyOn) {
+  if (isAlreadyOn) return disableGrid();
+
+  function disableGrid() {
     console.log('Disabling grid');
-    for (const elem of document.querySelectorAll('.__gv_css')) {
-      elem.remove();
-    }
-    globalThis.__gv_mo && globalThis.__gv_mo.disconnect();
-    return;
+    // globalThis.__gv_mo && globalThis.__gv_mo.disconnect();
+    for (const elem of document.querySelectorAll('.__gv_css')) elem.remove();
   }
 
+
   // Wait for call to join
+  let participantCount = 0;
   let wait = true;
   while (wait) {
-    if (document.querySelector('[data-participant-id][aria-label]')) {
+    participantCount = document.querySelectorAll('[data-participant-id][aria-label]').length;
+    if (participantCount > 0) {
       wait = false;
     }
     console.log('waiting to join call');
@@ -34,19 +36,16 @@ async function run() {
   console.log('call joined, lets go');
   console.log('Enabling grid');
 
-  for (const elem of document.querySelectorAll('[data-participant-id][aria-label]'))
-    elem.classList.add('thumb-item');
-  const container = document.querySelector('.thumb-item').parentElement;
+  const container = document.querySelector('[data-participant-id][aria-label]').parentElement;
   container.classList.add('thumb-container');
   container.parentElement.classList.add('bottom-row-container');
   container.previousElementSibling.classList.add('bottom-controls');
+
 
   // Get one grid update going first..
   let pinnedIndex = -1;
   gridUpdateLoop();
 
-  // apply our awesome grid styles
-  applyStyles();
 
   // update the grid whenever thumbnails are added/removed
   globalThis.__gv_mo = new MutationObserver(gridUpdateLoop);
@@ -55,9 +54,16 @@ async function run() {
   // This continually probes the number of participants & screen size to ensure videos are max possible size regardless of window layout
   // thanks https://github.com/Fugiman/google-meet-grid-view
   function gridUpdateLoop() {
+    // the [aria-label] attribute is set lazily, so we can't look for it at this point
+    const items = Array.from(container.children).filter(e => e.matches('[data-participant-id]'));
+    for (const elem of items) elem.classList.add('thumb-item');
+    participantCount = items.length;
+    if (participantCount === 1) return disableGrid();
+    if (participantCount > 1) ensureStylesApplied();
+
     const w = window.innerWidth / 16;
     const h = (window.innerHeight - 48) / 9;
-    let n = container.children.length;
+    let n = participantCount;
     if (pinnedIndex >= 0 && pinnedIndex < n) {
       // Simulate having an extra quarter of videos so we can dedicate a quarter to the pinned video
       n = Math.ceil((4 / 3) * (n - 1));
@@ -89,13 +95,16 @@ async function run() {
   }
 }
 
-function applyStyles() {
+function ensureStylesApplied() {
+  if (document.querySelector('.__gv_css')) return;
+
   const styles = `
 .thumb-item {
 /* [jscontroller="XUjPoc"] { */
     display: block;
     width: 100% !important;
     height: 100% !important;
+    transform: none !important;
 }
 
 .thumb-item video {
@@ -130,6 +139,8 @@ function applyStyles() {
 .thumb-item [data-ssrc] {
     width: 100% !important;
     height: 100% !important;
+    /* avoid shifting thumbnails when one is selected. */
+    position: static !important;
 }
 
 
