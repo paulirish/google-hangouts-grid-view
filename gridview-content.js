@@ -166,6 +166,11 @@ function ensureStylesApplied() {
 .GhN39b {
   z-index: 11;
 }
+
+/* Hide current speaker from the background */
+.qMwJZe {
+  visibility: hidden;
+}
     `;
 
   const elem = document.createElement('style');
